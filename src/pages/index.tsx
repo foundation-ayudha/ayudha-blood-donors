@@ -179,7 +179,7 @@ const Index = () => {
               </div>
             </div>
             <p className="text-gray-500 text-xs italic">
-              If you are a donor of a special blood group, please select 'Other'
+              If you are a donor of a special blood group, please select &lsquo;Other&rsquo;
               and specify.
             </p>
             {bloodGroup === "other" && (
@@ -211,13 +211,13 @@ const Index = () => {
             <input
               id="lastdonated"
               type="date"
-              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-0 leading-tight focus:shadow-outline"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-0 leading-tight focus:shadow-outline"
               placeholder="Select date"
               value={lastDonated}
               onChange={(e) => setLastDonated(e.target.value)}
             ></input>
             <p className="text-gray-500 text-xs italic">
-              If don't remember the date when you last donated blood, leave it as is.
+              If don&apos;t remember the date when you last donated blood, leave it as is.
             </p>
           </div>
 
