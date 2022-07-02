@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Link from "next/link";
 import { useRouter } from "next/router";
 import type { ReactNode } from "react";
@@ -50,9 +51,7 @@ const Main = (props: IMainProps) => {
             <ul className="flex flex-wrap text-xl">
               <li className="mr-6">
                 <Link href="/">
-                  <a
-                    className={activeTab(isActiveTab("", currentPath))}
-                  >
+                  <a className={activeTab(isActiveTab("", currentPath))}>
                     Register
                   </a>
                 </Link>
@@ -68,9 +67,7 @@ const Main = (props: IMainProps) => {
               </li>
               <li className="mr-6">
                 <Link href="/about/">
-                  <a
-                    className={activeTab(isActiveTab("about", currentPath))}
-                  >
+                  <a className={activeTab(isActiveTab("about", currentPath))}>
                     About
                   </a>
                 </Link>

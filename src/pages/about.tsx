@@ -12,7 +12,7 @@ const About = () => (
     }
   >
     <p>
-      We are a non-profit organization based out in <a target="_blank" href="https://www.google.com/maps/place/Adilabad(U),+Telangana+504001/">Adilabad 📌</a> that aims to provide a platform for blood
+      We are a non-profit organization based out in <a target="_blank" rel="noreferrer" href="https://www.google.com/maps/place/Adilabad(U),+Telangana+504001/">Adilabad 📌</a> that aims to provide a platform for blood
       donors to register themselves. People with enough previliges and access
       can have a look at the list of donors we already have and also few of them
       has rights to edit/delete them.
