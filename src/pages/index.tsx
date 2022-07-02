@@ -16,10 +16,14 @@ const postApiCall = async ({ name, phone, bloodGroup, lastDonated }, setError) =
     method: "POST",
     body: JSON.stringify({ name, phone, bloodGroup, lastDonated }),
   })
-    .then((res) => res.status)
-    .then((status) => {
-      if (status === 200) {
-        setError("noerror");
+    .then(async (res) => {
+      const json = await res.json();
+      if (res.status === 200) {
+        if (json.message === "Already Registered") {
+          setError("alreadyregistered");
+        } else {
+          setError("noerror");
+        }
       } else {
         setError("error");
       }
@@ -45,6 +49,11 @@ const successButton = classnames(submitButton, {
   "cursor-not-allowed": true,
   "hover:bg-green-700": true,
 });
+const alreadyRegistered = classnames(submitButton, {
+  "bg-yellow-500": true,
+  "cursor-not-allowed": true,
+  "hover:bg-yellow-700": true,
+});
 const errorButton = classnames(submitButton, {
   "bg-red-500": true,
   "cursor-not-allowed": true,
@@ -68,6 +77,10 @@ const buttonStyle = (disable: boolean, error: string | null) => {
     return successButton;
   }
 
+  if (error === "alreadyregistered") {
+    return alreadyRegistered;
+  }
+
   return errorButton;
 };
 
@@ -78,14 +91,6 @@ const Index = () => {
   const [specialBloodGroup, setSpecialBloodGroup] = useState("");
   const [lastDonated, setLastDonated] = useState(`${new Date().getFullYear()}-01-01`);
   const [error, setError] = useState(null);
-
-  console.table({
-    name,
-    phone,
-    bloodGroup,
-    specialBloodGroup,
-    lastDonated,
-  });
 
   const disableButton =
     name === "" ||
@@ -149,7 +154,7 @@ const Index = () => {
             </label>
             <div className="relative mb-4">
               <select
-                className="block appearance-none w-full bg-gray-200 border text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:bg-white focus:border-gray-500"
+                className="shadow appearance-none w-full border text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:bg-white focus:border-gray-500"
                 id="grid-state"
                 onChange={(e) => setBloodGroup(e.target.value)}
               >
@@ -228,6 +233,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <button
               className={buttonStyle(disableButton, error)}
+              disabled={disableButton}
               type="button"
               onClick={() => {
                 if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
@@ -251,7 +257,7 @@ const Index = () => {
                 ? "Register as Donor"
                 : error === "noerror"
                 ? "Registered Successfully"
-                : "Error Occured"}
+                : error === "alreadyregistered" ? "Already Registered!" : "Error Occured"}
             </button>
           </div>
         </form>

@@ -8,10 +8,42 @@ const client = new Client({ auth: token });
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!token || !databaseId) {
     res.status(500).send("Notion tokens not set");
+    return;
   }
 
   console.log(req.body);
   const { name, phone, bloodGroup, lastDonated } = JSON.parse(req.body);
+
+  const queryResult = await client.databases.query({
+    database_id: databaseId,
+    filter: {
+      and: [
+        {
+          property: "Donor Name",
+          rich_text: {
+            equals: name,
+          },
+        },
+        {
+          property: "Blood Group",
+          select: {
+            equals: bloodGroup,
+          },
+        },
+        {
+          property: "Contact",
+          phone_number: {
+            equals: phone,
+          },
+        },
+      ],
+    },
+  });
+
+  if (queryResult.results.length > 0) {
+    res.status(200).send({ message: "Already Registered" });
+    return;
+  }
 
   const response = await client.pages.create({
     parent: {
@@ -38,8 +70,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       "Last Donated": {
         date: {
           start: lastDonated,
-        }
-      }
+        },
+      },
     },
   });
   if (response.object === "page") {
