@@ -267,7 +267,7 @@ const Index = () => {
               User Agreement
             </span>
           </p>
-          <div className="flex items-center justify-between">
+          <div className="items-center justify-between">
             <button
               className={buttonStyle(disableButton, error)}
               disabled={disableButton}
@@ -299,6 +299,23 @@ const Index = () => {
                 ? "Already Registered!"
                 : "Error Occured"}
             </button>
+            {error === "noerror" && (
+              <p className="text-green-500 text-xs mb-4">
+                Thank you so much for registering yourself as a donor ❤️. You
+                can contact us for available donors at any time.
+              </p>
+            )}
+            {error === "alreadyregistered" && (
+              <p className="text-yellow-500 text-xs mb-4">
+                Seems like you have already registered with us.
+              </p>
+            )}
+            {error && error !== "noerror" && error !== "alreadyregisterd" && (
+              <p className="text-red-500 text-xs mb-4">
+                There seems to be some error. Please try again later. If you see
+                this consistently, please contact us.
+              </p>
+            )}
           </div>
         </form>
       </div>
