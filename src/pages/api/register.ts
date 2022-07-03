@@ -12,7 +12,9 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   console.log(req.body);
-  const { name, phone, bloodGroup, lastDonated } = JSON.parse(req.body);
+  const { name, phone, bloodGroup, lastDonated, address } = JSON.parse(
+    req.body
+  );
 
   const queryResult = await client.databases.query({
     database_id: databaseId,
@@ -71,6 +73,16 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         date: {
           start: lastDonated,
         },
+      },
+      Address: {
+        rich_text: [
+          {
+            type: "text",
+            text: {
+              content: address,
+            },
+          },
+        ],
       },
     },
   });

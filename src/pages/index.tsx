@@ -5,16 +5,20 @@ import classnames from "tailwindcss-classnames";
 
 import { Meta } from "@/layouts/Meta";
 import { Main } from "@/templates/Main";
+import Link from "next/link";
 
 const capitaliseName = (str: string) =>
   str.replace(/\w\S*/g, (txt) => {
     return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
   });
 
-const postApiCall = async ({ name, phone, bloodGroup, lastDonated }, setError) => {
+const postApiCall = async (
+  { name, phone, bloodGroup, lastDonated, address },
+  setError
+) => {
   fetch("/api/register", {
     method: "POST",
-    body: JSON.stringify({ name, phone, bloodGroup, lastDonated }),
+    body: JSON.stringify({ name, phone, bloodGroup, lastDonated, address }),
   })
     .then(async (res) => {
       const json = await res.json();
@@ -89,8 +93,12 @@ const Index = () => {
   const [phone, setPhone] = useState("");
   const [bloodGroup, setBloodGroup] = useState("O+ve");
   const [specialBloodGroup, setSpecialBloodGroup] = useState("");
-  const [lastDonated, setLastDonated] = useState(`${new Date().getFullYear()}-01-01`);
+  const [lastDonated, setLastDonated] = useState(
+    `${new Date().getFullYear()}-01-01`
+  );
+  const [address, setAddress] = useState("");
   const [error, setError] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const disableButton =
     name === "" ||
@@ -108,7 +116,9 @@ const Index = () => {
       }
     >
       <div className="w-full shadow-md rounded">
-        <h1 className="px-8 pt-6 pb-4 font-bold">Form Title</h1>
+        <h1 className="px-8 pt-6 pb-4 font-bold underline">
+          Ayudha Blood Donors Registration
+        </h1>
         <form className="bg-white px-8 pt-6 pb-8 mb-4">
           <div className="mb-8">
             <label
@@ -179,8 +189,8 @@ const Index = () => {
               </div>
             </div>
             <p className="text-gray-500 text-xs italic">
-              If you are a donor of a special blood group, please select &lsquo;Other&rsquo;
-              and specify.
+              If you are a donor of a special blood group, please select
+              &lsquo;Other&rsquo; and specify.
             </p>
             {bloodGroup === "other" && (
               <>
@@ -217,18 +227,45 @@ const Index = () => {
               onChange={(e) => setLastDonated(e.target.value)}
             ></input>
             <p className="text-gray-500 text-xs italic">
-              If don&apos;t remember the date when you last donated blood, leave it as is.
+              If you don&apos;t remember the date when you last donated blood,
+              leave it as is.
+            </p>
+          </div>
+          <div className="mb-6">
+            <label
+              className="block text-gray-700 text-sm font-bold mb-2"
+              htmlFor="phone"
+            >
+              Address
+            </label>
+            <textarea
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-0 leading-tight focus:shadow-outline"
+              id="phone"
+              placeholder="Address(es)"
+              type="textarea"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            ></textarea>
+            <p className="text-gray-500 text-xs italic">
+              Just so that we know where you stay when you need to be contacted.{" "}
+              <br />
+              For example: If your primary address is in Adilabad and you also
+              stay in Hyderabad, please add both addresses. It would be helpful
+              for all. <br />
+              Ex: Write each address on a new line as shown below. <br /> <br />
+              Shanthinagar, Adilabad <br />
+              Begumpet, Hyderabad
             </p>
           </div>
 
           <p className="text-gray-500 text-xs mb-4">
             By submitting the form by clicking the button, you agree to the{" "}
-            <a
-              className="align-baseline font-bold text-xs text-blue-500 hover:text-blue-800"
-              href="#"
+            <span
+              className="align-baseline font-bold text-xs text-blue-500 hover:text-blue-800 hover:underline cursor-pointer"
+              onClick={() => setShowModal(true)}
             >
               User Agreement
-            </a>
+            </span>
           </p>
           <div className="flex items-center justify-between">
             <button
@@ -248,6 +285,7 @@ const Index = () => {
                     bloodGroup:
                       bloodGroup === "other" ? specialBloodGroup : bloodGroup,
                     lastDonated,
+                    address,
                   },
                   setError
                 );
@@ -257,11 +295,92 @@ const Index = () => {
                 ? "Register as Donor"
                 : error === "noerror"
                 ? "Registered Successfully"
-                : error === "alreadyregistered" ? "Already Registered!" : "Error Occured"}
+                : error === "alreadyregistered"
+                ? "Already Registered!"
+                : "Error Occured"}
             </button>
           </div>
         </form>
       </div>
+      {showModal ? (
+        <>
+          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+              {/*content*/}
+              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+                {/*header*/}
+                <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
+                  <h3 className="text-3xl font-semibold">User Agreement</h3>
+                </div>
+                {/*body*/}
+                <div className="relative p-6 flex-auto">
+                  <p>
+                    <b>
+                      Our policy is simple: we do not collect any personal data
+                      from you and we never use it for monetisation 🚫. Your
+                      data is safe with us 🤝.
+                    </b>
+                  </p>
+                  <ul className="list-disc ml-6">
+                    <li className="text-base">
+                      ✅ By registering with us you agree to share your Name,
+                      Address, Blood Group and Contact info with us so you can
+                      be contacted in future in the times of need.
+                    </li>
+                    <li className="text-base">
+                      🩸 Your contact will only be shared to the concerned
+                      person or we contact you directly in need of blood, if you
+                      are in the best matches for the given situtaion. Apart
+                      from this, your data is never shared to a third-party and
+                      we never intend to do that.
+                    </li>
+                    <li className="text-base">
+                      📔 This is purely inteded for the purpose of providing a
+                      platform for blood donors to register themselves. This
+                      data collection is only to solve the pain point of not
+                      having a ready list of donors in critical times.
+                    </li>
+                    <li className="text-base">
+                      🔒 We never share your information to anyone unless there
+                      is a need for blood. We understand that the blood group
+                      and contact data of a person are sensitive, hence we never
+                      share with anyone without knowing the cause.
+                    </li>
+                    <li className="text-base">
+                      🕵️‍♂️ Also the list is not public so no other data harvester
+                      can get access to the list of data and put it to wrong use
+                      as such in using the data for promotions or monetisation
+                      or spamming etc.,
+                    </li>
+                    <li className="text-base">
+                      🔐 Only a certain people have rights to view/edit/delete
+                      the data, after you register with us. Edit is only used to
+                      update the last date of blood donation and Delete rights
+                      are only used when you want to delete your data from our
+                      donors list (it is only done on request basis).
+                    </li>
+                  </ul>
+
+                  <p className="text-base">
+                    📝 Feel free to reach out to use if you have any queries.
+                  </p>
+                </div>
+                {/*footer*/}
+                <div className="flex items-center justify-end p-6 border-t border-solid border-slate-200 rounded-b">
+                  <button
+                    className="text-blue-500 background-transparent font-bold uppercase px-6 py-2 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                    onClick={() => setShowModal(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="opacity-25 fixed inset-0 z-40 bg-black"></div>
+        </>
+      ) : null}
     </Main>
   );
 };
