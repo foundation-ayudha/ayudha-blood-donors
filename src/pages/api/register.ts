@@ -69,11 +69,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       Contact: {
         phone_number: phone,
       },
-      "Last Donated": {
-        date: {
-          start: lastDonated,
-        },
-      },
       Address: {
         rich_text: [
           {
@@ -84,6 +79,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
           },
         ],
       },
+      ...(lastDonated
+        ? {
+            "Last Donated": {
+              date: {
+                start: lastDonated || "",
+              },
+            },
+          }
+        : {}),
     },
   });
   if (response.object === "page") {

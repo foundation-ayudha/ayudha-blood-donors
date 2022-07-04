@@ -14,7 +14,8 @@ const capitaliseName = (str: string) =>
 
 const postApiCall = async (
   { name, phone, bloodGroup, lastDonated, address },
-  setError
+  setError,
+  setSubmitClicked
 ) => {
   fetch("/api/register", {
     method: "POST",
@@ -30,11 +31,13 @@ const postApiCall = async (
         }
       } else {
         setError("error");
+        setSubmitClicked(false);
       }
     })
     .catch((err) => {
       console.error(err);
       setError("error");
+      setSubmitClicked(false);
     });
 };
 
@@ -93,12 +96,17 @@ const Index = () => {
   const [phone, setPhone] = useState("");
   const [bloodGroup, setBloodGroup] = useState("O+ve");
   const [specialBloodGroup, setSpecialBloodGroup] = useState("");
+  const [alreadyDonated, setAlreadyDonated] = useState(false);
+  const dateToday = new Date();
   const [lastDonated, setLastDonated] = useState(
-    `${new Date().getFullYear()}-01-01`
+    `${dateToday.getFullYear()}-${(dateToday.getMonth() + 1)
+      .toString()
+      .padStart(2, "0")}-${dateToday.getDate().toString().padStart(2, "0")}`
   );
   const [address, setAddress] = useState("");
   const [error, setError] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [submitClicked, setSubmitClicked] = useState(false);
 
   const disableButton =
     name === "" ||
@@ -211,25 +219,44 @@ const Index = () => {
             )}
           </div>
           <div className="mb-6">
-            <label
-              className="block tracking-wide text-gray-700 text-xs font-bold mb-2"
-              htmlFor="bloodgroup"
-            >
-              Last Donated On
-            </label>
+            <div className="flex items-center mb-4">
+              <input
+                id="alreadydonated"
+                type="checkbox"
+                value={alreadyDonated}
+                onChange={(e) => setAlreadyDonated(e.target.checked)}
+                className="w-4 h-4 text-blue-600 bg-gray-100 rounded border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              ></input>
+              <label
+                htmlFor="alreadydonated"
+                className="ml-2 tracking-wide text-gray-700 font-normal"
+              >
+                Have you donated blood in past?
+              </label>
+            </div>
+            {alreadyDonated && (
+              <>
+                <label
+                  className="block tracking-wide text-gray-700 text-xs font-bold mb-2"
+                  htmlFor="bloodgroup"
+                >
+                  Last Donated On
+                </label>
 
-            <input
-              id="lastdonated"
-              type="date"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-0 leading-tight focus:shadow-outline"
-              placeholder="Select date"
-              value={lastDonated}
-              onChange={(e) => setLastDonated(e.target.value)}
-            ></input>
-            <p className="text-gray-500 text-xs italic">
-              If you don&apos;t remember the date when you last donated blood,
-              leave it as is.
-            </p>
+                <input
+                  id="lastdonated"
+                  type="date"
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-0 leading-tight focus:shadow-outline"
+                  placeholder="Select date"
+                  value={lastDonated}
+                  onChange={(e) => setLastDonated(e.target.value)}
+                ></input>
+                <p className="text-gray-500 text-xs italic">
+                  If you don&apos;t remember the date when you last donated
+                  blood, leave it as is.
+                </p>
+              </>
+            )}
           </div>
           <div className="mb-6">
             <label
@@ -269,8 +296,8 @@ const Index = () => {
           </p>
           <div className="items-center justify-between">
             <button
-              className={buttonStyle(disableButton, error)}
-              disabled={disableButton}
+              className={buttonStyle(submitClicked || disableButton, error)}
+              disabled={submitClicked || disableButton}
               type="button"
               onClick={() => {
                 if (phone.length !== 10 || !/^\d{10}$/.test(phone)) {
@@ -278,16 +305,18 @@ const Index = () => {
                   return;
                 }
 
+                setSubmitClicked(true);
                 postApiCall(
                   {
                     name: capitaliseName(name),
                     phone,
                     bloodGroup:
                       bloodGroup === "other" ? specialBloodGroup : bloodGroup,
-                    lastDonated,
+                    lastDonated: alreadyDonated ? lastDonated : null,
                     address,
                   },
-                  setError
+                  setError,
+                  setSubmitClicked
                 );
               }}
             >
@@ -310,7 +339,7 @@ const Index = () => {
                 Seems like you have already registered with us.
               </p>
             )}
-            {error && error !== "noerror" && error !== "alreadyregisterd" && (
+            {error && error !== "noerror" && error !== "alreadyregistered" && (
               <p className="text-red-500 text-xs mb-4">
                 There seems to be some error. Please try again later. If you see
                 this consistently, please contact us.
@@ -321,16 +350,16 @@ const Index = () => {
       </div>
       {showModal ? (
         <>
-          <div className="justify-center items-center flex overflow-x-hidden overflow-y-auto fixed inset-0 z-50 outline-none focus:outline-none">
-            <div className="relative w-auto my-6 mx-auto max-w-3xl">
+          <div className="my-10 mx-2 justify-center items-center flex fixed inset-0 z-50 outline-none focus:outline-none">
+            <div className="relative w-auto my-6 mx-auto max-w-3xl h-full">
               {/*content*/}
-              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
+              <div className="border-0 rounded-lg shadow-lg relative flex flex-col w-full h-full bg-white outline-none focus:outline-none">
                 {/*header*/}
                 <div className="flex items-start justify-between p-5 border-b border-solid border-slate-200 rounded-t">
                   <h3 className="text-3xl font-semibold">User Agreement</h3>
                 </div>
                 {/*body*/}
-                <div className="relative p-6 flex-auto">
+                <div className="relative p-6 flex-auto overflow-x-hidden overflow-y-auto h-full">
                   <p>
                     <b>
                       Our policy is simple: we do not collect any personal data
